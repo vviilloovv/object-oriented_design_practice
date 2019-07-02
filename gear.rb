@@ -12,8 +12,12 @@ class Gear
   end
 
   def gear_inches
+    ratio * diameter
+  end
+
+  def diameter
     # タイヤはリムの周りを囲むため2倍する
-    ratio * (rim + (tire * 2))
+    rim + (tire * 2)
   end
 end
 

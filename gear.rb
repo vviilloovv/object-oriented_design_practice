@@ -15,9 +15,11 @@ class Gear
     ratio * diameter
   end
 
-  def diameter
-    # タイヤはリムの周りを囲むため2倍する
-    rim + (tire * 2)
+  Wheel = Struct.new(:rim, :tire) do
+    def diameter
+      # タイヤはリムの周りを囲むため2倍する
+      rim + (tire * 2)
+    end
   end
 end
 

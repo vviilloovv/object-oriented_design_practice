@@ -5,32 +5,41 @@ class Bicycle
     @size = args[:size]
     @chain = args[:chain] || default_chain
     @tire_size = args[:tire_size] || default_tire_size
+    post_initialize(args)
   end
 
   def spares
     { tire_size: tire_size,
-      chain: chain }
+      chain: chain }.merge(local_spares)
+  end
+
+  def default_tire_size
+    raise NotImplementedError
+  end
+
+  # subclasses may orverride
+  def post_initialize(args)
+    nil
+  end
+
+  def local_spares
+    {}
   end
 
   def default_chain
     "10-speed"
-  end
-
-  def default_tire_size
-    raise NotImplementedError,
   end
 end
 
 class RoadBike < Bicycle
   attr_reader :tape_color
 
-  def initialize(args)
-    @type_color = args[:type_color]
-    super(args)
+  def post_initialize(args)
+    @tape_color = args[:tape_color]
   end
 
-  def spares
-    super.merge({ tape_color: tape_color })
+  def local_spares
+    { tape_color: tape_color }
   end
 
   def default_tire_size
@@ -41,14 +50,13 @@ end
 class MountainBike < Bicycle
   attr_reader :front_shock, :rear_shock
 
-  def initialize(args)
+  def post_initialize(args)
     @front_shock = args[:front_shock]
     @rear_shock = args[:rear_shock]
-    super(args)
   end
 
-  def spares
-    super.merge(rear_shock: rear_shock)
+  def local_spares
+    { rear_shock: rear_shock }
   end
 
   def default_tire_size
@@ -58,16 +66,14 @@ end
 
 road_bike = RoadBike.new(
   size: "M",
-  tape_color: "red" )
+  tape_color: "red")
 
-puts road_bike.tire_size
-puts road_bike.chain
+puts road_bike.spares
 
 mountain_bike = MountainBike.new(
   size: "S",
   front_shock: "Manitou",
   rear_shock: "Fox" )
 
-puts mountain_bike.tire_size
-puts mountain_bike.chain
+puts mountain_bike.spares
 

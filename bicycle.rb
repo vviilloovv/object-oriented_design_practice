@@ -1,8 +1,20 @@
 class Bicycle
-  attr_reader :size, :chain, :tire_size
+  attr_reader :size, :parts
 
   def initialize(args = {})
     @size = args[:size]
+    @parts = args[:parts]
+  end
+
+  def spares
+    parts.spares
+  end
+end
+
+class Parts
+  attr_reader :chain, :tire_size
+
+  def initialize(args = {})
     @chain = args[:chain] || default_chain
     @tire_size = args[:tire_size] || default_tire_size
     post_initialize(args)

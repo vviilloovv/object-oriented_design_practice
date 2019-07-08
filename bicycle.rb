@@ -1,66 +1,49 @@
 class Bicycle
-  attr_reader :size, :parts
+  attr_reader :size, :chain, :tire_size
 
   def initialize(args = {})
     @size = args[:size]
-    @parts = args[:parts]
+    @chain = args[:chain] || default_chain
+    @chain_size = args[:tire_size] || default_tire_size
+    post_initialize(args)
   end
 
   def spares
-    parts.spares
+    { tire_size: tire_size,
+      chain: chain }.merge(local_spares)
+  end
+
+  def default_tire_size
+    raise NotImplementedError
+  end
+
+  # subclasses may override
+  def post_initialize(args)
+    nil
+  end
+
+  def local_spares
+    {}
+  end
+
+  def default_chain
+    "10-speed"
   end
 end
 
-require 'forwardable'
-class Parts
-  extend Forwardable
-  def_delegators :@parts, :size, :each
-  include Enumerable
+class RoadBike < Bicycle
+  attr_reader :tape_color
 
-  def initialize(parts)
-    @parts = parts
+  def post_initialize(args)
+    @tape_color = args[:tape_color]
   end
 
-  def spares
-    select { |part| part.needs_spare }
-  end
-end
-
-require 'ostruct'
-module PartsFactory
-  def self.build(config, parts_class = Parts)
-    parts_class.new(
-      config.map { |part_config| create_part(part_config) })
+  def local_spares
+    { tape_color: tape_color }
   end
 
-  def self.create_part(part_config)
-    OpenStruct.new(
-      name: part_config[0],
-      description: part_config[1],
-      needs_spare: part_config.fetch(2, true))
+  def default_tire_size
+    "23"
   end
 end
-
-road_config = 
-  [["chain", "10-speed"],
-   ["tire_size", "2.1"],
-   ["tape_color", "red"]]
-
-mountain_config =
-  [["chain", "10-speed"],
-   ["tire_size", "2.1"],
-   ["front_shock", "Manitou", false],
-   ["rear_shock", "Fox"]]
-
-road_bike = Bicycle.new(
-  size: "L",
-  parts: PartsFactory.build(road_config))
-
-p road_bike.spares
-
-mountain_bike = Bicycle.new(
-  size: "S",
-  parts: PartsFactory.build(mountain_config))
-
-p mountain_bike.spares
 

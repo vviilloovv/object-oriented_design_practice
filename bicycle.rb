@@ -4,7 +4,7 @@ class Bicycle
   def initialize(args = {})
     @size = args[:size]
     @chain = args[:chain] || default_chain
-    @chain_size = args[:tire_size] || default_tire_size
+    @tire_size = args[:tire_size] || default_tire_size
     post_initialize(args)
   end
 

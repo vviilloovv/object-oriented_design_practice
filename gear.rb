@@ -1,11 +1,26 @@
-require_relative 'wheel'
+require_relative './wheel'
 
 class Gear
-  attr_reader :chainring, :cog, :wheel
-  def initialize(chainring:, cog:, wheel: nil)
-    @chainring = chainring
-    @cog = cog
-    @wheel = wheel
+  attr_reader :chainring, :cog, :wheel, :observer
+  def initialize(args)
+    @chainring = args[:chainring]
+    @cog = args[:cog]
+    @wheel = args[:wheel]
+    @observer = args[:observer]
+  end
+
+  def set_cog(new_cog)
+    @cog = new_cog
+    changed
+  end
+
+  def set_chainring(new_chainring)
+    @chainring = new_chainring
+    changed
+  end
+
+  def changed
+    observer.changed(chainring, cog)
   end
 
   def ratio
@@ -13,7 +28,7 @@ class Gear
   end
 
   def gear_inches
-    ratio * wheel.diameter
+    ratio * wheel.width
   end
 end
 
